@@ -28,7 +28,8 @@ namespace OpenUtau.Core.G2p {
 
         private readonly Dictionary<char, string[]> alternate = new() {
             { 'ą', ["A"] },
-            { 'ę', ["E"]},
+            { 'ę', ["E"] },
+            { 'ó', ["u"] },
             { 'ć', ["C"] },
             { 'ł', ["L"] },
             { 'ń', ["N"] },
