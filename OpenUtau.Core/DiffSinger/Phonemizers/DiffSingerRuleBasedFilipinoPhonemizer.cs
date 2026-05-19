@@ -22,6 +22,8 @@ namespace OpenUtau.Core.G2p {
 
         public bool IsVowel(string symbol) => vowels.Contains(symbol);
 
+        bool IsConsonant(string symbol) => !symbol.Equals("|") && !IsVowel(symbol);
+
         public string[] UnpackHint(string hint, char separator = ' ') {
             return hint.Split(separator)
                 .Where(x => validPhonemes.Contains(x))
@@ -64,12 +66,20 @@ namespace OpenUtau.Core.G2p {
                         if (prev.Equals("n")) phonemes[^1] = "ng";
                         else phonemes.Add("g");
                         break;
+                    case 'h':
+                        if (prev.Equals("c")) phonemes[^1] = "ty";
+                        else phonemes.Add("h");
+                        break;
                     case 'j':
                         phonemes.Add("dy");
                         break;
                     case 'ñ':
                         phonemes.Add("n");
                         phonemes.Add("y");
+                        break;
+                    case 's':
+                        if (prev.Equals("t")) phonemes[^1] = "ty";
+                        else phonemes.Add("s");
                         break;
                     case 'y':
                         if (prev.Equals("t") || prev.Equals("d") || prev.Equals("s"))
@@ -90,6 +100,21 @@ namespace OpenUtau.Core.G2p {
                         break;
                 }
             }
+            
+            // glide pass
+            for (int i = 1; i < phonemes.Count - 1; i++) {
+                string prev = phonemes[i - 1];
+                string curr = phonemes[i];
+                string next = phonemes[i + 1];
+                phonemes[i] = curr switch {
+                    "u" when IsConsonant(prev) && IsVowel(next) => "w",
+                    "i" when IsConsonant(prev) && IsVowel(next) => "y",
+                    _ => phonemes[i]
+                };
+            }
+            
+            // extra palatalization pass
+            
 
             string[] filteredPhonemes = phonemes.Where(x => validPhonemes.Contains(x)).ToArray();
 
